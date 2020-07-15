@@ -1,0 +1,112 @@
+/**
+ * Copyright (C) 2020, Hensoldt Cyber GmbH
+ */
+
+#pragma once
+
+import <if_OS_Nic.camkes>;
+import <if_OS_Timer.camkes>;
+
+//------------------------------------------------------------------------------
+// Components
+
+#define DECLARE_COMPONENT_MAILBOX_HW(_type_hw_) \
+    \
+    component mailbox_ ## _type_hw_ { \
+        hardware; \
+        dataport Buf mailboxBaseReg; \
+    }
+
+
+#define DECLARE_COMPONENT_USB_HW(_type_hw_) \
+    \
+    component usbBase_ ## _type_hw_ { \
+        hardware; \
+        dataport Buf usbBaseReg; \
+        emits DataAvailable usbBaseIrq; \
+    }
+
+
+#define DECLARE_COMPONENT_NIC_DRV(_type_drv_) \
+    \
+    component _type_drv_ { \
+        control; \
+        \
+        /* lower interface to USB ------------------------------------- */ \
+        dataport Buf mailboxBaseReg; \
+        dataport Buf usbBaseReg; \
+        consumes DataAvailable usbBaseIrq; \
+        \
+        /* upper interface as NIC Driver ---------------------------------- */ \
+        provides if_OS_Nic nic_rpc; \
+        emits EventDataAvailable nic_event_hasData; \
+        dataport Buf nic_port_to; /* driver -> network stack */  \
+        dataport Buf nic_port_from; /* network stack -> driver */ \
+        has semaphore nic_driver_init_done; \
+        \
+        /* usage of Timer ---------------------------------- */ \
+        uses if_OS_Timer timeServer_rpc; \
+    }
+
+
+//------------------------------------------------------------------------------
+// Instance creation and connection
+
+#define DECLARE_AND_CONNECT_INSTANCE_NIC_DRV_HW( \
+    _type_hw_mb_, \
+    _inst_hw_mb_, \
+    _type_hw_usb_, \
+    _inst_hw_usb_, \
+    _type_drv_, \
+    _inst_drv_) \
+    \
+    component   mailbox_ ## _type_hw_mb_   _inst_hw_mb_; \
+    component   usbBase_ ## _type_hw_usb_   _inst_hw_usb_; \
+    component   _type_drv_          _inst_drv_; \
+    \
+    connection  seL4HardwareMMIO       _inst_drv_ ## _inst_hw_mb_ ## _mmio( \
+                from _inst_drv_.mailboxBaseReg, \
+                to   _inst_hw_mb_.mailboxBaseReg); \
+    \
+    connection  seL4HardwareMMIO       _inst_drv_ ## _inst_hw_usb_ ## _mmio( \
+                from _inst_drv_.usbBaseReg, \
+                to   _inst_hw_usb_.usbBaseReg); \
+    \
+    connection  seL4HardwareInterrupt       _inst_drv_ ## _inst_hw_usb_ ## _irq( \
+                from _inst_hw_usb_.usbBaseIrq, \
+                to   _inst_drv_.usbBaseIrq); \
+
+
+//------------------------------------------------------------------------------
+// Instance Configuration
+
+/* mailbox memory base register and size (the actual mailbox base address is 0x3F00B880 but when mapping the base address has to be PAGE_SIZE alligned */ \
+#define CONFIGURE_INSTANCE_MAILBOX_HW( \
+            _inst_hw_, \
+            _phys_addr_, \
+            _size_) \
+    \
+    _inst_hw_.mailboxBaseReg_paddr  = _phys_addr_; \
+    _inst_hw_.mailboxBaseReg_size   = _size_; \
+
+
+/* USB interrupt is marked as 9, but according to line to the seL4 BCM2837 interrupt handling, the normal IRQs start from 64 => 64 + 9 = 73 */ \
+#define CONFIGURE_INSTANCE_USB_HW( \
+            _inst_hw_, \
+            _phys_addr_, \
+            _size_, \
+            _irq_number_) \
+    \
+    _inst_hw_.usbBaseReg_paddr  = _phys_addr_; \
+    _inst_hw_.usbBaseReg_size   = _size_; \
+    _inst_hw_.usbBaseIrq_irq_number   = _irq_number_; \
+
+
+/* assign memory region to NIC driver used to dynamically allocate memory chunks for dma usage */ \
+#define CONFIGURE_INSTANCE_NIC_DRV( \
+            _inst_drv_, \
+            _dma_size_) \
+    \
+    _inst_drv_.dma_pool  = _dma_size_; \
+    _inst_drv_.nic_driver_init_done_value  = 0;
+

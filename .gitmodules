@@ -1,0 +1,3 @@
+[submodule "uspi"]
+	path = uspi
+	url = ssh://git@bitbucket.hensoldt-cyber.systems:7999/ext/uspi.git

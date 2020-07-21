@@ -43,6 +43,7 @@ import <if_OS_Timer.camkes>;
         dataport Buf nic_port_to; /* driver -> network stack */  \
         dataport Buf nic_port_from; /* network stack -> driver */ \
         has semaphore nic_driver_init_done; \
+        has binary_semaphore nic_init_transfer; \
         \
         /* usage of Timer ---------------------------------- */ \
         uses if_OS_Timer timeServer_rpc; \
@@ -108,5 +109,6 @@ import <if_OS_Timer.camkes>;
             _dma_size_) \
     \
     _inst_drv_.dma_pool  = _dma_size_; \
-    _inst_drv_.nic_driver_init_done_value  = 0;
+    _inst_drv_.nic_driver_init_done_value  = 0; \
+    _inst_drv_.nic_init_transfer_value = 1; \
 

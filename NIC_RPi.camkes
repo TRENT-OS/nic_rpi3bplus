@@ -40,7 +40,7 @@ import <if_OS_Timer.camkes>;
         /* upper interface as NIC Driver ---------------------------------- */ \
         provides if_OS_Nic nic_rpc; \
         emits EventDataAvailable nic_event_hasData; \
-        dataport Buf nic_port_to; /* driver -> network stack */  \
+        dataport Buf(64*4096) nic_port_to; /* driver -> network stack */  \
         dataport Buf nic_port_from; /* network stack -> driver */ \
         has semaphore nic_driver_init_done; \
         has binary_semaphore nic_init_transfer; \

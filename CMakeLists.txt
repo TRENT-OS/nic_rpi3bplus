@@ -65,7 +65,7 @@ macro(DeclareCAmkESComponent_NIC_RPi name)
         LIBS
             os_libs
             TimeServer_client
-
+            os_core_api
     )
 
 endmacro()

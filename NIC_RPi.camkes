@@ -37,6 +37,9 @@ import <if_OS_Timer.camkes>;
         dataport Buf usbBaseReg; \
         consumes DataAvailable usbBaseIrq; \
         \
+        emits      EventTransferDone   e_transfer_done; \
+        consumes   EventTransferDone   c_transfer_done; \
+        \
         /* upper interface as NIC Driver ---------------------------------- */ \
         provides if_OS_Nic nic_rpc; \
         emits EventDataAvailable nic_event_hasData; \

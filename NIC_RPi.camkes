@@ -7,6 +7,14 @@
 import <if_OS_Nic.camkes>;
 import <if_OS_Timer.camkes>;
 
+#define OS_NETWORK_STR_(x) #x
+#define OS_NETWORK_STR(x)  OS_NETWORK_STR_(x)
+
+#if !__has_include(OS_NETWORK_STR(OS_NETWORK_CONFIG_H_FILE))
+#error "OS_NETWORK_CONFIG_H_FILE is not a header."
+#endif
+#include OS_NETWORK_STR(OS_NETWORK_CONFIG_H_FILE)
+
 //------------------------------------------------------------------------------
 // Components
 
@@ -40,8 +48,8 @@ import <if_OS_Timer.camkes>;
         /* upper interface as NIC Driver ---------------------------------- */ \
         provides if_OS_Nic nic_rpc; \
         emits EventDataAvailable nic_event_hasData; \
-        dataport Buf nic_port_to; /* driver -> network stack */  \
-        dataport Buf nic_port_from; /* network stack -> driver */ \
+        dataport Buf(NIC_DRIVER_RINGBUFFER_SIZE) nic_port_to; /* driver -> network stack */  \
+        dataport Buf                             nic_port_from; /* network stack -> driver */ \
         has semaphore nic_driver_init_done; \
         has binary_semaphore nic_init_transfer; \
         \

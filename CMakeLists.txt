@@ -62,10 +62,10 @@ macro(DeclareCAmkESComponent_NIC_RPi name)
         C_FLAGS
             -Wall
             -Werror
+            -DOS_NETWORK_CONFIG_H_FILE=${OS_NETWORK_CONFIG_H_FILE}
         LIBS
             os_libs
             TimeServer_client
-
     )
 
 endmacro()

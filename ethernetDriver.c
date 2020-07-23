@@ -18,13 +18,17 @@
 #include "environment.h"
 
 #include "OS_Dataport.h"
+#include "network/OS_NetworkStack.h"
 
-/* When sending data to the nw_stack, the data is saved in the dataport in the following way:
-	0 - 4080 	=> read data
-	4080 - 4096 => length of the read data
-*/
-#define MAX_READ_DATA_LENGTH		4080
-#define POINTER_TO_LEN_IN_DATAPORT ((size_t*)(((uint8_t*)nic_port_to) + MAX_READ_DATA_LENGTH))
+#include <sel4/sel4.h>
+
+#define OS_NETWORK_STR_(x) #x
+#define OS_NETWORK_STR(x)  OS_NETWORK_STR_(x)
+
+#if !__has_include(OS_NETWORK_STR(OS_NETWORK_CONFIG_H_FILE))
+#error "OS_NETWORK_CONFIG_H_FILE is not a header."
+#endif
+#include OS_NETWORK_STR(OS_NETWORK_CONFIG_H_FILE)
 
 /* Private variables ----------------------------------------------------------------*/
 unsigned long usb_host_controller_base_paddr;
@@ -74,23 +78,34 @@ int run()
 	uint8_t* Buffer = (uint8_t*)dma_alloc(DMA_PAGE_SIZE, DMA_ALIGNEMENT);
 	size_t receivedLength = 0;
 
+	unsigned int count = 0;
 	while(true)
 	{
-		if(*POINTER_TO_LEN_IN_DATAPORT == 0)
+		if(USPiReceiveFrame(Buffer, &receivedLength))
 		{
-			if(USPiReceiveFrame (Buffer, &receivedLength))
-			{
-				if(receivedLength > MAX_READ_DATA_LENGTH)
-				{
-					Debug_LOG_WARNING("The max length of the data is %u, but the length of the read data is %u",
-											MAX_READ_DATA_LENGTH, receivedLength);
-				}
+            OS_NetworkStack_RxBuffer_t* buf_ptr = (OS_NetworkStack_RxBuffer_t*)nic_port_to;
 
-				memcpy((((uint8_t*)nic_port_to) + *POINTER_TO_LEN_IN_DATAPORT), Buffer, receivedLength);
-				*POINTER_TO_LEN_IN_DATAPORT += receivedLength;
+            if (receivedLength > sizeof(buf_ptr->data) )
+            {
+                Debug_LOG_WARNING(
+                    "The max length of the data is %u, but the length of the "
+                    "read data is %u",
+                    sizeof(buf_ptr->data),
+                    receivedLength);
+                // throw away current frame and read the next one
+                continue;
+            }
 
-				nic_event_hasData_emit();
-			}
+            // if the slot to be used in the ringbuffer isn't empty we
+			// wait here in a loop
+			// TODO: Implement it in an event driven fashion
+			while(buf_ptr[count].len != 0) {
+                seL4_Yield();
+            }
+			memcpy(buf_ptr[count].data, Buffer, receivedLength);
+			buf_ptr[count].len = receivedLength;
+            count = (count + 1) % NIC_DRIVER_RINGBUFFER_NUMBER_ELEMENTS;
+            nic_event_hasData_emit();
 		}
 	}
 

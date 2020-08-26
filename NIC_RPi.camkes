@@ -51,6 +51,7 @@ import <if_OS_Timer.camkes>;
         \
         /* usage of Timer ---------------------------------- */ \
         uses if_OS_Timer timeServer_rpc; \
+        consumes TimerReady timeServer_notify; \
     }
 
 

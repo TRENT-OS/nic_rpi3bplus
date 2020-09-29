@@ -11,8 +11,6 @@
 
 #include "LibDebug/Debug.h"
 
-#include <platsupport/plat/spt.h>
-
 #include <camkes.h>
 
 #include "environment.h"

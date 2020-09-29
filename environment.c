@@ -26,7 +26,9 @@ static const if_OS_Timer_t timer =
 /* Environment functions -------------------------------------------------------------*/
 void* dma_alloc (unsigned nSize, unsigned alignement)
 {
-    return camkes_dma_alloc(nSize, alignement);
+    // we are setting cached to false to allocate non-cached DMA memory for the
+    // NIC driver
+    return camkes_dma_alloc(nSize, alignement, false);
 }
 
 void dma_free (void* pBlock, unsigned alignement)

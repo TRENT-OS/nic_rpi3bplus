@@ -1,5 +1,5 @@
 #
-# NIC RPi Driver
+# NIC RPi3 driver
 #
 # Copyright (C) 2020, Hensoldt Cyber GmbH
 #

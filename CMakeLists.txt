@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.17)
 
 
-macro(DeclareCAmkESComponent_NIC_RPi name)
+function(DeclareCAmkESComponent_NIC_RPi name)
 
     DeclareCAmkESComponent(
         ${name}
@@ -59,4 +59,4 @@ macro(DeclareCAmkESComponent_NIC_RPi name)
             TimeServer_client
     )
 
-endmacro()
+endfunction()

@@ -9,9 +9,9 @@
  *
  *      #include "NIC_RPI/NIC_RPi.camkes"
  *
- *      NIC_RPi_COMPONENT_DECLARE(NIC_RPI)
- *      NIC_RPi_USB_COMPONENT_DECLARE(NIC_RPi_USB)
- *      NIC_RPi_Mailbox_COMPONENT_DECLARE(NIC_RPi_Mailbox)
+ *      NIC_RPi_COMPONENT_DEFINE(NIC_RPI)
+ *      NIC_RPi_USB_COMPONENT_DEFINE(NIC_RPi_USB)
+ *      NIC_RPi_Mailbox_COMPONENT_DEFINE(NIC_RPi_Mailbox)
  *
  */
 
@@ -36,11 +36,11 @@ import <if_OS_Timer.camkes>;
 /*
  * Declare the NIC_RPI Mailbox HW component:
  *
- *      NIC_RPi_Mailbox_COMPONENT_DECLARE(
+ *      NIC_RPi_Mailbox_COMPONENT_DEFINE(
  *          <name>
  *      )
  */
-#define NIC_RPi_Mailbox_COMPONENT_DECLARE( \
+#define NIC_RPi_Mailbox_COMPONENT_DEFINE( \
     _name_) \
     \
     component _name_ { \
@@ -52,11 +52,11 @@ import <if_OS_Timer.camkes>;
 /*
  * Declare the NIC_RPI USB HW component:
  *
- *      NIC_RPi_USB_COMPONENT_DECLARE(
+ *      NIC_RPi_USB_COMPONENT_DEFINE(
  *          <name>
  *      )
  */
-#define NIC_RPi_USB_COMPONENT_DECLARE( \
+#define NIC_RPi_USB_COMPONENT_DEFINE( \
     _name_) \
     \
     component _name_ { \
@@ -69,11 +69,11 @@ import <if_OS_Timer.camkes>;
 /*
  * Declare the NIC_RPI driver component:
  *
- *      NIC_RPi_COMPONENT_DECLARE(
+ *      NIC_RPi_COMPONENT_DEFINE(
  *          <name>
  *      )
  */
-#define NIC_RPi_COMPONENT_DECLARE( \
+#define NIC_RPi_COMPONENT_DEFINE( \
     _name_, \
     _ringbuffer_size_) \
     \

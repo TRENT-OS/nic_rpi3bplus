@@ -9,28 +9,43 @@ import <if_OS_Timer.camkes>;
 
 
 //------------------------------------------------------------------------------
-// Components
 
-#define DECLARE_COMPONENT_MAILBOX_HW(_type_hw_) \
+
+#define NIC_RPI_MAILBOX_BCM2837_DATAPORT_PADDR  0x3F00B000
+#define NIC_RPI_MAILBOX_BCM2837_DATAPORT_SIZE   0x1000
+
+#define NIC_RPI_USB_BCM2837_DATAPORT_PADDR      0x3F980000
+#define NIC_RPI_USB_BCM2837_DATAPORT_SIZE       0x1000
+#define NIC_RPI_USB_BCM2837_IRQ                 73
+
+
+//------------------------------------------------------------------------------
+
+
+#define NIC_RPi_Mailbox_COMPONENT_DECLARE( \
+    _name_) \
     \
-    component mailbox_ ## _type_hw_ { \
+    component _name_ { \
         hardware; \
         dataport Buf mailboxBaseReg; \
     }
 
 
-#define DECLARE_COMPONENT_USB_HW(_type_hw_) \
+#define NIC_RPi_USB_COMPONENT_DECLARE( \
+    _name_) \
     \
-    component usbBase_ ## _type_hw_ { \
+    component _name_ { \
         hardware; \
         dataport Buf usbBaseReg; \
         emits DataAvailable usbBaseIrq; \
     }
 
 
-#define DECLARE_COMPONENT_NIC_DRV(_type_drv_, _ringbuffer_size_) \
+#define NIC_RPi_COMPONENT_DECLARE( \
+    _name_, \
+    _ringbuffer_size_) \
     \
-    component _type_drv_ { \
+    component _name_ { \
         control; \
         \
         /* lower interface to USB ------------------------------------- */ \
@@ -53,64 +68,82 @@ import <if_OS_Timer.camkes>;
 
 
 //------------------------------------------------------------------------------
-// Instance creation and connection
 
-#define DECLARE_AND_CONNECT_INSTANCE_NIC_DRV_HW( \
-    _type_hw_mb_, \
-    _inst_hw_mb_, \
-    _type_hw_usb_, \
-    _inst_hw_usb_, \
-    _type_drv_, \
-    _inst_drv_) \
+
+#define NIC_RPi_INSTANCE_CONNECT( \
+    _inst_, \
+    _inst_mb_, \
+    _inst_usb_) \
     \
-    component   mailbox_ ## _type_hw_mb_   _inst_hw_mb_; \
-    component   usbBase_ ## _type_hw_usb_   _inst_hw_usb_; \
-    component   _type_drv_          _inst_drv_; \
+    connection  seL4HardwareMMIO \
+        _inst_ ## _inst_mb_ ## _mmio( \
+            from _inst_.mailboxBaseReg, \
+            to   _inst_mb_.mailboxBaseReg \
+        ); \
     \
-    connection  seL4HardwareMMIO       _inst_drv_ ## _inst_hw_mb_ ## _mmio( \
-                from _inst_drv_.mailboxBaseReg, \
-                to   _inst_hw_mb_.mailboxBaseReg); \
+    connection  seL4HardwareMMIO \
+        _inst_ ## _inst_usb_ ## _mmio( \
+            from _inst_.usbBaseReg, \
+            to   _inst_usb_.usbBaseReg \
+        ); \
     \
-    connection  seL4HardwareMMIO       _inst_drv_ ## _inst_hw_usb_ ## _mmio( \
-                from _inst_drv_.usbBaseReg, \
-                to   _inst_hw_usb_.usbBaseReg); \
-    \
-    connection  seL4HardwareInterrupt       _inst_drv_ ## _inst_hw_usb_ ## _irq( \
-                from _inst_hw_usb_.usbBaseIrq, \
-                to   _inst_drv_.usbBaseIrq); \
+    connection  seL4HardwareInterrupt \
+        _inst_ ## _inst_usb_ ## _irq( \
+            from _inst_usb_.usbBaseIrq, \
+            to   _inst_.usbBaseIrq \
+        );
 
 
 //------------------------------------------------------------------------------
-// Instance Configuration
 
-/* mailbox memory base register and size (the actual mailbox base address is 0x3F00B880 but when mapping the base address has to be PAGE_SIZE alligned */ \
-#define CONFIGURE_INSTANCE_MAILBOX_HW( \
-            _inst_hw_, \
-            _phys_addr_, \
-            _size_) \
+
+#define NIC_RPi_INSTANCE_CONNECT_CLIENT( \
+    _inst_, \
+    _nic_rpc_, \
+    _nic_dp_to_, \
+    _nic_dp_from_, \
+    _nic_ev_) \
     \
-    _inst_hw_.mailboxBaseReg_paddr  = _phys_addr_; \
-    _inst_hw_.mailboxBaseReg_size   = _size_; \
+    connection seL4NotificationNative  \
+        _inst_ ## _nic_ev( \
+            from    _inst_.nic_event_hasData,\
+            to      _nic_ev_); \
+    connection seL4RPCCall \
+        _inst_ ## _nic_rpc( \
+            from    _nic_rpc_, \
+            to      _inst_.nic_rpc); \
+    connection seL4SharedData \
+        _inst_ ## _nic_dp_from ( \
+            from    _inst_.nic_port_to, \
+            to      _nic_dp_from_); \
+    connection seL4SharedData \
+        _inst_ ## _nic_dp_to( \
+            from    _inst_.nic_port_from, \
+            to      _nic_dp_to_);
 
 
-/* USB interrupt is marked as 9, but according to line to the seL4 BCM2837 interrupt handling, the normal IRQs start from 64 => 64 + 9 = 73 */ \
-#define CONFIGURE_INSTANCE_USB_HW( \
-            _inst_hw_, \
-            _phys_addr_, \
-            _size_, \
-            _irq_number_) \
+//------------------------------------------------------------------------------
+
+
+#define NIC_RPi_Mailbox_INSTANCE_CONFIGURE_SELF( \
+    _inst_) \
     \
-    _inst_hw_.usbBaseReg_paddr  = _phys_addr_; \
-    _inst_hw_.usbBaseReg_size   = _size_; \
-    _inst_hw_.usbBaseIrq_irq_number   = _irq_number_; \
+    _inst_.mailboxBaseReg_paddr  = NIC_RPI_MAILBOX_BCM2837_DATAPORT_PADDR; \
+    _inst_.mailboxBaseReg_size   = NIC_RPI_MAILBOX_BCM2837_DATAPORT_SIZE;
 
 
-/* assign memory region to NIC driver used to dynamically allocate memory chunks for dma usage */ \
-#define CONFIGURE_INSTANCE_NIC_DRV( \
-            _inst_drv_, \
-            _dma_size_) \
+#define NIC_RPi_USB_INSTANCE_CONFIGURE_SELF( \
+    _inst_) \
     \
-    _inst_drv_.dma_pool  = _dma_size_; \
-    _inst_drv_.nic_driver_init_done_value  = 0; \
-    _inst_drv_.nic_init_transfer_value = 1; \
+    _inst_.usbBaseReg_paddr      = NIC_RPI_USB_BCM2837_DATAPORT_PADDR; \
+    _inst_.usbBaseReg_size       = NIC_RPI_USB_BCM2837_DATAPORT_SIZE; \
+    _inst_.usbBaseIrq_irq_number = NIC_RPI_USB_BCM2837_IRQ;
 
+
+#define NIC_RPi_INSTANCE_CONFIGURE( \
+    _inst_, \
+    _dma_size_) \
+    \
+    _inst_.dma_pool                     = _dma_size_; \
+    _inst_.nic_driver_init_done_value   = 0; \
+    _inst_.nic_init_transfer_value      = 1;

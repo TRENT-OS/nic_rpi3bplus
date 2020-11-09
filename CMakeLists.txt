@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.17)
 
 
-function(DeclareCAmkESComponent_NIC_RPi name)
+function(NIC_RPi_DeclareCAmkESComponent name)
 
     DeclareCAmkESComponent(
         ${name}

@@ -1,8 +1,19 @@
-/**
+/*
  * Copyright (C) 2020, Hensoldt Cyber GmbH
  */
 
-#pragma once
+/*
+ *  NIC_RPi CAmkES Component
+ *
+ *  to be used as:
+ *
+ *      #include "NIC_RPI/NIC_RPi.camkes"
+ *
+ *      NIC_RPi_COMPONENT_DECLARE(NIC_RPI)
+ *      NIC_RPi_USB_COMPONENT_DECLARE(NIC_RPi_USB)
+ *      NIC_RPi_Mailbox_COMPONENT_DECLARE(NIC_RPi_Mailbox)
+ *
+ */
 
 import <if_OS_Nic.camkes>;
 import <if_OS_Timer.camkes>;
@@ -22,6 +33,13 @@ import <if_OS_Timer.camkes>;
 //------------------------------------------------------------------------------
 
 
+/*
+ * Declare the NIC_RPI Mailbox HW component:
+ *
+ *      NIC_RPi_Mailbox_COMPONENT_DECLARE(
+ *          <name>
+ *      )
+ */
 #define NIC_RPi_Mailbox_COMPONENT_DECLARE( \
     _name_) \
     \
@@ -31,6 +49,13 @@ import <if_OS_Timer.camkes>;
     }
 
 
+/*
+ * Declare the NIC_RPI USB HW component:
+ *
+ *      NIC_RPi_USB_COMPONENT_DECLARE(
+ *          <name>
+ *      )
+ */
 #define NIC_RPi_USB_COMPONENT_DECLARE( \
     _name_) \
     \
@@ -41,6 +66,13 @@ import <if_OS_Timer.camkes>;
     }
 
 
+/*
+ * Declare the NIC_RPI driver component:
+ *
+ *      NIC_RPi_COMPONENT_DECLARE(
+ *          <name>
+ *      )
+ */
 #define NIC_RPi_COMPONENT_DECLARE( \
     _name_, \
     _ringbuffer_size_) \
@@ -70,6 +102,15 @@ import <if_OS_Timer.camkes>;
 //------------------------------------------------------------------------------
 
 
+/*
+ * Connect a NIC_RPI driver instance to the two HW instances.
+ *
+ *      NIC_RPi_INSTANCE_CONNECT(
+ *          <nic>,
+ *          <mailbox>,
+ *          <usb>
+ *      )
+ */
 #define NIC_RPi_INSTANCE_CONNECT( \
     _inst_, \
     _inst_mb_, \
@@ -97,6 +138,14 @@ import <if_OS_Timer.camkes>;
 //------------------------------------------------------------------------------
 
 
+/*
+ * Assign client interface:
+ *
+ *      NIC_RPi_INSTANCE_CONNECT_CLIENT(
+ *          <instance>,
+ *          <nic>.<rpc>, <nic>.<port_to>, <nic>.<port_from>, <nic>.<evt>,
+ *      )
+ */
 #define NIC_RPi_INSTANCE_CONNECT_CLIENT( \
     _inst_, \
     _nic_rpc_, \
@@ -125,6 +174,17 @@ import <if_OS_Timer.camkes>;
 //------------------------------------------------------------------------------
 
 
+/*
+ * Let NIC_RPi_Mailbox configure itself:
+ *
+ *      NIC_RPi_Mailbox_INSTANCE_CONFIGURE_SELF(
+ *          <instance>
+ *      )
+ *
+ * NOTE: mailbox memory base register and size (the actual mailbox base address
+ *       is 0x3F00B880 but when mapping the base address has to be PAGE_SIZE
+ *       aligned.
+ */
 #define NIC_RPi_Mailbox_INSTANCE_CONFIGURE_SELF( \
     _inst_) \
     \
@@ -132,6 +192,16 @@ import <if_OS_Timer.camkes>;
     _inst_.mailboxBaseReg_size   = NIC_RPI_MAILBOX_BCM2837_DATAPORT_SIZE;
 
 
+/*
+ * Let NIC_RPi_USB configure itself:
+ *
+ *      NIC_RPi_USB_INSTANCE_CONFIGURE_SELF(
+ *          <instance>
+ *      )
+ *
+ * NOTE: USB interrupt is marked as 9, but according to line to the seL4 BCM2837
+ *       interrupt handling, the normal IRQs start from 64 => 64 + 9 = 73.
+ */
 #define NIC_RPi_USB_INSTANCE_CONFIGURE_SELF( \
     _inst_) \
     \
@@ -140,6 +210,15 @@ import <if_OS_Timer.camkes>;
     _inst_.usbBaseIrq_irq_number = NIC_RPI_USB_BCM2837_IRQ;
 
 
+/*
+ * Configure the memory region of NIC driver, this is used to dynamically
+ * allocate memory chunks for dma usage.
+ *
+ *      NIC_RPi_INSTANCE_CONFIGURE(
+ *          <instance>,
+ *          <size>
+ *      )
+ */
 #define NIC_RPi_INSTANCE_CONFIGURE( \
     _inst_, \
     _dma_size_) \

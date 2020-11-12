@@ -15,6 +15,8 @@
  *
  */
 
+#pragma once
+
 import <if_OS_Nic.camkes>;
 import <if_OS_Timer.camkes>;
 

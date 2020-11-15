@@ -109,7 +109,17 @@ int run()
 }
 
 /* nic_rpc interface ----------------------------------------------------------------*/
-OS_Error_t nic_rpc_tx_data(size_t* len)
+
+OS_Error_t
+nic_rpc_rx_data(
+	size_t* pLen,
+	size_t* framesRemaining)
+{
+    return OS_ERROR_NOT_IMPLEMENTED;
+}
+
+OS_Error_t nic_rpc_tx_data(
+	size_t* len)
 {
 	if (!USPiSendFrame(nic_port_from, *len))
 	{
@@ -120,7 +130,7 @@ OS_Error_t nic_rpc_tx_data(size_t* len)
 	return OS_SUCCESS;
 }
 
-OS_Error_t nic_rpc_get_mac(void)
+OS_Error_t nic_rpc_get_mac_address(void)
 {
 	if(!nic_driver_init_done_wait())
 	{

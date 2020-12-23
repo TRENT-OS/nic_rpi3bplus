@@ -8,7 +8,7 @@
 
 #include <uspios.h>
 
-#include "LibDebug/Debug.h"
+#include "lib_debug/Debug.h"
 
 #include "environment.h"
 #include "mailboxInterface.h"

@@ -54,7 +54,8 @@ function(NIC_RPi_DeclareCAmkESComponent name)
             -Wall
             -Werror
         LIBS
-            os_libs
+            os_core_api
+            lib_debug
             TimeServer_client
     )
 

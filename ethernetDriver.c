@@ -9,7 +9,7 @@
 #include <uspi/macros.h>
 #include <uspi/dwhcidevice.h>
 
-#include "LibDebug/Debug.h"
+#include "lib_debug/Debug.h"
 
 #include <camkes.h>
 

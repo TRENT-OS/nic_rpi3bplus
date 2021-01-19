@@ -1,5 +1,7 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include <stdio.h>

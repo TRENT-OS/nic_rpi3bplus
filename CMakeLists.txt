@@ -12,43 +12,43 @@ function(NIC_RPi_DeclareCAmkESComponent name)
     DeclareCAmkESComponent(
         ${name}
         INCLUDES
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/include
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/include
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib
         SOURCES
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ethernetDriver.c
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/environment.c
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/mailboxInterface.c
 
             # USPi Library
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/uspilibrary.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhcidevice.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhciregister.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhcixferstagedata.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbconfigparser.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbdevice.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbdevicefactory.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbendpoint.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbrequest.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbstandardhub.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/devicenameservice.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/macaddress.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbfunction.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/smsc951x.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/lan7800.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/string.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/util.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbmassdevice.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhciframeschednper.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhciframeschedper.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/keymap.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbkeyboard.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhcirootport.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbmouse.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhciframeschednsplit.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbgamepad.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/synchronize.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbstring.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbmidi.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/uspilibrary.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/dwhcidevice.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/dwhciregister.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/dwhcixferstagedata.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbconfigparser.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbdevice.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbdevicefactory.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbendpoint.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbrequest.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbstandardhub.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/devicenameservice.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/macaddress.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbfunction.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/smsc951x.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/lan7800.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/string.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/util.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbmassdevice.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/dwhciframeschednper.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/dwhciframeschedper.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/keymap.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbkeyboard.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/dwhcirootport.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbmouse.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/dwhciframeschednsplit.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbgamepad.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/synchronize.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbstring.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/usbmidi.c
 
         C_FLAGS
             -Wall

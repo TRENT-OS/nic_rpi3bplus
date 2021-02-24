@@ -1,61 +1,58 @@
 #
-# NIC RPi3 driver
+# RasPi3 (BCM2837) RPI SD driver
 #
 # Copyright (C) 2020, Hensoldt Cyber GmbH
 #
 
 cmake_minimum_required(VERSION 3.17)
 
-
+#-------------------------------------------------------------------------------
+# Declare RasPi3 (BCM2837) SPI MSD Driver CAmkES Component
+#       TODO
+#
+# Parameters:
+#
+#   <name>
+#     required, component instance name
+#
+#   LIBS <lib_1> <lib_2> ...
+#     additional libraries. At least a TimeServer client library is required
+#
 function(NIC_RPi_DeclareCAmkESComponent name)
+
+    cmake_parse_arguments(
+        PARSE_ARGV
+        1
+        RPI_SD
+        ""
+        ""
+        "LIBS"
+    )
 
     DeclareCAmkESComponent(
         ${name}
         INCLUDES
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/include
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/lib
         SOURCES
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ethernetDriver.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/RPi_NIC.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/lib/bcm54213.c
+
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/lib/synchronize64.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/lib/macaddress.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/lib/netdevice.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/lib/memio.c
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/environment.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/mailboxInterface.c
-
-            # USPi Library
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/uspilibrary.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhcidevice.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhciregister.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhcixferstagedata.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbconfigparser.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbdevice.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbdevicefactory.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbendpoint.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbrequest.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbstandardhub.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/devicenameservice.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/macaddress.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbfunction.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/smsc951x.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/lan7800.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/string.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/util.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbmassdevice.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhciframeschednper.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhciframeschedper.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/keymap.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbkeyboard.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhcirootport.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbmouse.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/dwhciframeschednsplit.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbgamepad.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/synchronize.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbstring.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/uspi/lib/usbmidi.c
-
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/mailboxInterface.c 
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/lib/spinlock.c
+            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/lib/string.c
         C_FLAGS
             -Wall
             -Werror
         LIBS
-            os_libs
-            TimeServer_client
+            os_core_api
+            lib_debug
+            ${RPI_SD_LIBS}
     )
 
 endfunction()

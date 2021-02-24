@@ -13,8 +13,7 @@
 #define POWER_STATE_WAIT	(1 << 1)
 #define POWER_STATE_NO_DEVICE	(1 << 1)	// in response
 #define DEVICE_ID_SD_CARD	0
-#define DEVICE_ID_USB_HCD	3
-
+#define DEVICE_ID_USB_HCD	3		// for SetPowerStateOn()
 /* Type declarations -------------------------------------------------------------*/
 typedef struct PropertyTagPowerState
 {
@@ -31,3 +30,54 @@ typedef struct PropertyTagMACAddress
 	uint8_t		Padding[2];
 }
 PropertyTagMACAddress;
+
+typedef struct PropertyTagClockRate
+{
+	MailboxInterface_PropertyTag	Tag;
+	uint32_t nClockId;
+	#define CLOCK_ID_EMMC		1
+	#define CLOCK_ID_UART		2
+	#define CLOCK_ID_ARM		3
+	#define CLOCK_ID_CORE		4
+	#define CLOCK_ID_EMMC2		12
+	uint32_t nRate;			// Hz
+}
+PropertyTagClockRate;
+
+typedef struct PropertyTagGPIOState
+{
+	MailboxInterface_PropertyTag	Tag;
+	uint32_t		nGPIO;
+	#define EXP_GPIO_BASE		128
+	#define EXP_GPIO_NUM		8
+	uint32_t		nState;
+}
+PropertyTagGPIOState;
+
+typedef struct PropertyTagBoardModel
+{
+	MailboxInterface_PropertyTag	Tag;
+	uint32_t nBoardModel;
+}
+PropertyTagBoardModel;
+
+typedef enum TMachineModel
+{
+	MachineModelA,
+	MachineModelBRelease1MB256,
+	MachineModelBRelease2MB256,
+	MachineModelBRelease2MB512,
+	MachineModelAPlus,
+	MachineModelBPlus,
+	MachineModelZero,
+	MachineModelZeroW,
+	MachineModel2B,
+	MachineModel3B,
+	MachineModel3APlus,
+	MachineModel3BPlus,
+	MachineModelCM,
+	MachineModelCM3,
+	MachineModelCM3Plus,
+	MachineModel4B,
+	MachineModelUnknown
+} TMachineModel;

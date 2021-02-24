@@ -1,55 +1,47 @@
 /**
- * Copyright (C) 2019, Hensoldt Cyber GmbH
- */
-
-#include <string.h>
-
-#include <uspi.h>
-#include <uspios.h>
-#include <uspi/macros.h>
-#include <uspi/dwhcidevice.h>
-
-#include "LibDebug/Debug.h"
-
-#include <camkes.h>
-
-#include "environment.h"
-
+* Copyright (C) 2020, Hensoldt Cyber GmbH
+*/
+#include "OS_Error.h"
 #include "OS_Dataport.h"
+#include "lib_debug/Debug.h"
+#include "environment.h"
+#include <circleos.h>
+#include <circle/bcm54213.h>
+
 #include "network/OS_NetworkStack.h"
 
+#include <string.h>
+#include <stdlib.h>
+
 #include <sel4/sel4.h>
+
+#include <camkes.h>
 
 // If we pass the define from a system configuration header. CAmkES generation
 // crashes when parsing this file. As a workaround we hardcode the value here
 #define NIC_DRIVER_RINGBUFFER_NUMBER_ELEMENTS 16
 
-/* Private variables ----------------------------------------------------------------*/
-unsigned long usb_host_controller_base_paddr;
+boolean init_ok = false;
 
-void
-post_init(void)
+void post_init(void)
 {
-	usb_host_controller_base_paddr = (unsigned long)usbBaseReg;
+    Debug_LOG_INFO("GenetDevice_init");
+	Bcm54213Device();
+    init_ok = true;
+    Debug_LOG_INFO("post_init() done");
 }
 
-/* Main -----------------------------------------------------------------------------*/
-int run()
+int run(void)
 {
-	if (!USPiInitialize())
+    if (!Bcm54213Initialize())
 	{
-		Debug_LOG_ERROR("Cannot initialize USPi");
+		Debug_LOG_ERROR("Cannot initialize BCM54213");
 	}
 
 	Debug_LOG_INFO("[EthDrv '%s'] starting", get_instance_name());
 
-	if (!USPiEthernetAvailable ())
-	{
-		Debug_LOG_ERROR("Ethernet device not found");
-	}
-
 	unsigned nTimeout = 0;
-	while (!USPiEthernetIsLinkUp ())
+	while (!Bcm54213IsLinkUp())
 	{
 		MsDelay (100);
 
@@ -75,22 +67,22 @@ int run()
 	unsigned int count = 0;
 	while(true)
 	{
-		if(USPiReceiveFrame(Buffer, &receivedLength))
+		if(Bcm54213ReceiveFrame(Buffer,(u32 *)&receivedLength))
 		{
-            OS_NetworkStack_RxBuffer_t* buf_ptr = (OS_NetworkStack_RxBuffer_t*)nic_port_to;
+            OS_NetworkStack_RxBuffer_t* buf_ptr = (OS_NetworkStack_RxBuffer_t*)nic_to_port;
 
             if (receivedLength > sizeof(buf_ptr->data) )
             {
                 Debug_LOG_WARNING(
                     "The max length of the data is %u, but the length of the "
-                    "read data is %u",
-                    sizeof(buf_ptr->data),
+                    "read data is %ld",
+                    (unsigned)sizeof(buf_ptr->data),
                     receivedLength);
                 // throw away current frame and read the next one
                 continue;
             }
 
-            // if the slot to be used in the ringbuffer isn't empty we
+			// if the slot to be used in the ringbuffer isn't empty we
 			// wait here in a loop
 			// TODO: Implement it in an event driven fashion
 			while(buf_ptr[count].len != 0) {
@@ -105,8 +97,9 @@ int run()
 
 	dma_free(Buffer, DMA_ALIGNEMENT);
 
-	return 0;
+	return OS_SUCCESS;
 }
+
 
 /* nic_rpc interface ----------------------------------------------------------------*/
 
@@ -121,9 +114,9 @@ nic_rpc_rx_data(
 OS_Error_t nic_rpc_tx_data(
 	size_t* len)
 {
-	if (!USPiSendFrame(nic_port_from, *len))
+	if (!Bcm54213SendFrame(nic_from_port,*len))
 	{
-        Debug_LOG_ERROR("USPiSendFrame failed");
+        Debug_LOG_ERROR("Bcm54213SendFrame failed");
 		return OS_ERROR_ABORTED;
 	}
 
@@ -137,17 +130,28 @@ OS_Error_t nic_rpc_get_mac_address(void)
 		Debug_LOG_DEBUG("Wait failed.");
 	}
 
-	USPiGetMACAddress((uint8_t*)nic_port_to);
+    GetMACAddress((uint8_t *)nic_to_port);
 
 	return OS_SUCCESS;
 }
 
-/* USB interrupt handler -----------------------------------------------------------------*/
-void usbBaseIrq_handle(void) {
+/* Genet interrupt handler A-----------------------------------------------------------------*/
+void genetA_BaseIrq_handle(void) {
+    InterruptHandler0();
 
-	DWHCIDeviceInterruptHandler(NULL);
+	int error = genetA_BaseIrq_acknowledge();
 
-	int error = usbBaseIrq_acknowledge();
+    if(error != 0)
+	{
+		Debug_LOG_ERROR("Failed to acknowledge the interrupt!");
+	}
+}
+
+/* Genet interrupt handler B-----------------------------------------------------------------*/
+void genetB_BaseIrq_handle(void) {
+    InterruptHandler1();
+
+	int error = genetB_BaseIrq_acknowledge();
 
     if(error != 0)
 	{

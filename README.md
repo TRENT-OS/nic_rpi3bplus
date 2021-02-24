@@ -1,1 +1,1 @@
-# Network Driver for Raspberry Pi
+# NIC_Rpi component

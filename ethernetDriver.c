@@ -78,7 +78,7 @@ int run()
 	{
 		if(USPiReceiveFrame(Buffer, &receivedLength))
 		{
-            OS_NetworkStack_RxBuffer_t* buf_ptr = (OS_NetworkStack_RxBuffer_t*)nic_port_to;
+            OS_NetworkStack_RxBuffer_t* buf_ptr = (OS_NetworkStack_RxBuffer_t*)nic_to_port;
 
             if (receivedLength > sizeof(buf_ptr->data) )
             {
@@ -122,7 +122,7 @@ nic_rpc_rx_data(
 OS_Error_t nic_rpc_tx_data(
 	size_t* len)
 {
-	if (!USPiSendFrame(nic_port_from, *len))
+	if (!USPiSendFrame(nic_from_port, *len))
 	{
         Debug_LOG_ERROR("USPiSendFrame failed");
 		return OS_ERROR_ABORTED;
@@ -138,7 +138,7 @@ OS_Error_t nic_rpc_get_mac_address(void)
 		Debug_LOG_DEBUG("Wait failed.");
 	}
 
-	USPiGetMACAddress((uint8_t*)nic_port_to);
+	USPiGetMACAddress((uint8_t*)nic_to_port);
 
 	return OS_SUCCESS;
 }

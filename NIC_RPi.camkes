@@ -16,7 +16,7 @@
 #pragma once
 
 import <std_connector.camkes>;
-import <if_OS_Nic.camkes>;
+#include <if_OS_Nic.camkes>
 import <if_OS_Timer.camkes>;
 
 
@@ -88,11 +88,8 @@ import <if_OS_Timer.camkes>;
         dataport Buf usbBaseReg; \
         consumes DataAvailable usbBaseIrq; \
         \
-        /* upper interface as NIC Driver ---------------------------------- */ \
-        provides if_OS_Nic nic_rpc; \
-        emits EventDataAvailable nic_event_hasData; \
-        dataport Buf(_ringbuffer_size_) nic_port_to; /* driver -> network stack */  \
-        dataport Buf                    nic_port_from; /* network stack -> driver */ \
+        /* provide NIC Driver interface ------------------------------- */ \
+        IF_OS_NIC_LOWER_INTERFACE_FIELDS(nic, _ringbuffer_size_) \
         \
         /* usage of Timer ---------------------------------- */ \
         uses if_OS_Timer timeServer_rpc; \
@@ -134,42 +131,6 @@ import <if_OS_Timer.camkes>;
             from _inst_usb_.usbBaseIrq, \
             to   _inst_.usbBaseIrq \
         );
-
-
-//------------------------------------------------------------------------------
-
-
-/*
- * Assign client interface:
- *
- *      NIC_RPi_INSTANCE_CONNECT_CLIENT(
- *          <instance>,
- *          <nic>.<rpc>, <nic>.<port_to>, <nic>.<port_from>, <nic>.<evt>,
- *      )
- */
-#define NIC_RPi_INSTANCE_CONNECT_CLIENT( \
-    _inst_, \
-    _nic_rpc_, \
-    _nic_port_to_, \
-    _nic_port_from_, \
-    _nic_ev_) \
-    \
-    connection seL4NotificationNative  \
-        _inst_ ## _nic_ev( \
-            from    _inst_.nic_event_hasData,\
-            to      _nic_ev_); \
-    connection seL4RPCCall \
-        _inst_ ## _nic_rpc( \
-            from    _nic_rpc_, \
-            to      _inst_.nic_rpc); \
-    connection seL4SharedData \
-        _inst_ ## _nic_port_from ( \
-            from    _inst_.nic_port_to, \
-            to      _nic_port_from_); \
-    connection seL4SharedData \
-        _inst_ ## _nic_port_to( \
-            from    _inst_.nic_port_from, \
-            to      _nic_port_to_);
 
 
 //------------------------------------------------------------------------------

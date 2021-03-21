@@ -1,18 +1,15 @@
 /*
+ * NIC_RPi CAmkES Component
+ *
  * Copyright (C) 2020-2021, HENSOLDT Cyber GmbH
  * SPDX-License-Identifier: BSD-3-Clause
- */
-
-/*
- *  NIC_RPi CAmkES Component
  *
- *  to be used as:
+ * to be used as:
  *
- *      #include "NIC_RPI/NIC_RPi.camkes"
- *
- *      NIC_RPi_COMPONENT_DEFINE(NIC_RPI)
- *      NIC_RPi_USB_COMPONENT_DEFINE(NIC_RPi_USB)
- *      NIC_RPi_Mailbox_COMPONENT_DEFINE(NIC_RPi_Mailbox)
+ *   #include "NIC_RPI/NIC_RPi.camkes"
+ *   NIC_RPi_Mailbox_COMPONENT_DEFINE(NIC_RPi_Mailbox)
+ *   NIC_RPi_USB_COMPONENT_DEFINE(NIC_RPi_USB)
+ *   NIC_RPi_COMPONENT_DEFINE(NIC_RPI, 4096)
  *
  */
 

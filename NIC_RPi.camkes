@@ -80,6 +80,8 @@ import <if_OS_Timer.camkes>;
     \
     component _name_ { \
         control; \
+        has semaphore nic_driver_init_done; \
+        has binary_semaphore nic_init_transfer; \
         \
         /* lower interface to USB ------------------------------------- */ \
         dataport Buf mailboxBaseReg; \
@@ -91,8 +93,6 @@ import <if_OS_Timer.camkes>;
         emits EventDataAvailable nic_event_hasData; \
         dataport Buf(_ringbuffer_size_) nic_port_to; /* driver -> network stack */  \
         dataport Buf                    nic_port_from; /* network stack -> driver */ \
-        has semaphore nic_driver_init_done; \
-        has binary_semaphore nic_init_transfer; \
         \
         /* usage of Timer ---------------------------------- */ \
         uses if_OS_Timer timeServer_rpc; \

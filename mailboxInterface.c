@@ -17,7 +17,7 @@
 /*
 	See: https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
 */
-#define VALUE_LENGTH_RESPONSE	(1 << 31)
+#define VALUE_LENGTH_RESPONSE	(1u << 31)
 
 //	the actual mailbox base address is 0x3F00B880 but when mapping the
 //	base address has to be PAGE_SIZE alligned

@@ -89,7 +89,7 @@ import <if_OS_Timer.camkes>;
         consumes DataAvailable usbBaseIrq; \
         \
         /* provide NIC Driver interface ------------------------------- */ \
-        IF_OS_NIC_LOWER_INTERFACE_FIELDS(nic, _ringbuffer_size_) \
+        IF_OS_NIC_PROVIDE(nic, _ringbuffer_size_) \
         \
         /* usage of Timer ---------------------------------- */ \
         uses if_OS_Timer timeServer_rpc; \

@@ -5,30 +5,21 @@
 
 #pragma once
 
-/* Includes -------------------------------------------------------------*/
-#include "mailboxInterface.h"
+#include <platsupport/plat/mailbox_util.h>
 
-/* Defines -------------------------------------------------------------*/
-#define POWER_STATE_OFF		(0 << 0)
-#define POWER_STATE_ON		(1 << 0)
-#define POWER_STATE_WAIT	(1 << 1)
-#define POWER_STATE_NO_DEVICE	(1 << 1)	// in response
-#define DEVICE_ID_SD_CARD	0
-#define DEVICE_ID_USB_HCD	3
+#define MAC_ADDR_LEN 6
 
-/* Type declarations -------------------------------------------------------------*/
-typedef struct PropertyTagPowerState
-{
-	MailboxInterface_PropertyTag	Tag;
-	uint32_t		nDeviceId;
-	uint32_t		nState;
+typedef struct {
+    MailboxInterface_PropertyTag_t tag;
 }
-PropertyTagPowerState;
+PropertyTag_GetMACAddress_Request_t;
 
-typedef struct PropertyTagMACAddress
-{
-	MailboxInterface_PropertyTag	Tag;
-	uint8_t		Address[6];
-	uint8_t		Padding[2];
+typedef struct {
+    MailboxInterface_PropertyTag_t tag;
+    uint8_t mac_address[6];
 }
-PropertyTagMACAddress;
+PropertyTag_GetMACAddress_Response_t;
+
+#define TAG_GET_MAC_ADDRESS 0x00010003
+
+int mbox_init(ps_io_ops_t *io_ops);

@@ -18,7 +18,6 @@ function(NIC_RPi_DeclareCAmkESComponent name)
         SOURCES
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ethernetDriver.c
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/environment.c
-            ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/mailboxInterface.c
 
             # USPi Library
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/3rdParty/uspi/lib/uspilibrary.c

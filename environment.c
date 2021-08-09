@@ -12,12 +12,13 @@
 #include "lib_debug/Debug.h"
 
 #include "environment.h"
-#include "mailboxInterface.h"
 
 #include "TimeServer.h"
 
 #include <camkes.h>
 #include <camkes/dma.h>
+
+static mailbox_t mbox;
 
 static const if_OS_Timer_t timer =
     IF_OS_TIMER_ASSIGN(
@@ -105,36 +106,39 @@ void ConnectInterrupt (unsigned nIRQ, TInterruptHandler* pHandler, void* pParam)
     Debug_LOG_WARNING("Not implemented!");
 }
 
-int SetPowerStateOn (unsigned nDeviceId)
-{
-    PropertyTagPowerState PowerState;
-    PowerState.nDeviceId = nDeviceId;
-    PowerState.nState = POWER_STATE_ON | POWER_STATE_WAIT;
-
-    if (!MailboxInterface_getTag (PROPTAG_SET_POWER_STATE, &PowerState,
-                                  sizeof PowerState, 8)
-        || (PowerState.nState & POWER_STATE_NO_DEVICE)
-        || !(PowerState.nState & POWER_STATE_ON))
-    {
-        Debug_LOG_ERROR("Failed to set power state on!");
-        return 0;
+int mbox_init(ps_io_ops_t *io_ops){
+    int ret = mailbox_init(io_ops,&mbox);
+    if(ret < 0){
+        Debug_LOG_ERROR("Failed to initialize mailbox - error code: %d", ret);
+        return ret;
     }
-
-    return 1;
+    return 0;
 }
 
-int GetMACAddress (unsigned char Buffer[6])
+int SetPowerStateOn (unsigned nDeviceId)
 {
-    PropertyTagMACAddress MACAddress;
+    return bcm2837_set_power_state_on(&mbox,nDeviceId) ? 1 : 0;
+}
 
-    if (!MailboxInterface_getTag(PROPTAG_GET_MAC_ADDRESS, &MACAddress,
-                                 sizeof(MACAddress), 0))
-    {
-        Debug_LOG_ERROR("Failed to retreive the MAC address!");
+int GetMACAddress (unsigned char Buffer[MAC_ADDR_LEN])
+{
+    PropertyTag_GetMACAddress_Request_t TagRequest;
+    PropertyTag_GetMACAddress_Response_t TagResponse;
+
+    int status = (&mbox)->message(&mbox,
+                                   TAG_GET_MAC_ADDRESS,
+                                   &TagRequest,
+                                   sizeof(TagRequest),
+                                   &TagResponse,
+                                   sizeof(TagResponse));
+
+    if(MAILBOX_OK != status){
+        Debug_LOG_ERROR("Failed to retrieve the MAC address!");
+        memset(Buffer,0,MAC_ADDR_LEN);
         return 0;
     }
 
-    memcpy(Buffer, MACAddress.Address, 6);
+    memcpy(Buffer,TagResponse.mac_address,MAC_ADDR_LEN);
 
     return 1;
 }

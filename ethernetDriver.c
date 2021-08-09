@@ -13,13 +13,17 @@
 #include "lib_debug/Debug.h"
 
 #include <camkes.h>
+#include <camkes/io.h>
 
 #include "environment.h"
 
+#include "OS_Error.h"
 #include "OS_Dataport.h"
 #include "network/OS_NetworkStack.h"
 
 #include <sel4/sel4.h>
+
+#include <platsupport/plat/mailbox_util.h>
 
 // If we pass the define from a system configuration header. CAmkES generation
 // crashes when parsing this file. As a workaround we hardcode the value here
@@ -28,15 +32,55 @@
 /* Private variables ----------------------------------------------------------------*/
 unsigned long usb_host_controller_base_paddr;
 
+// The marker stating wether the initialization was successful must be flagged
+// volatile when strictly following the C rules. A hypothetical highly advanced
+// optimizer could turn global variable accesses into constants, if it concludes
+// the global state is always well known. Also, there is no rule in C that
+// global variables must be synced with memory content on function entry and
+// exit - it is just something that happen due to practical reasons. There is
+// not even a rule that functions must be preserved and can't be inlined, which
+// would eventually allow caching global variables easily. Furthermore, C also
+// does not know threads nor concurrent execution of functions, but both have a
+// string impact on global variables.
+// Using volatile here guarantees at least, that accesses to global variables
+// are accessing the actual memory in the given order stated in the program and
+// there is no caching or constant folding that removes memory accesses. That is
+// the best we can do to avoid surprises at higher optimization levels.
+static volatile bool init_ok = false;
+
 void
 post_init(void)
 {
+	ps_io_ops_t io_ops;
+	int ret = camkes_io_ops(&io_ops);
+    if (0 != ret)
+    {
+        Debug_LOG_ERROR("camkes_io_ops() failed - error code: %d", ret);
+        return;
+    }
+
+    //mailbox initialization
+    ret = mbox_init(&io_ops);
+    if (0 != ret)
+    {
+		Debug_LOG_ERROR("Mailbox initialization failed!");
+        return;
+    }
+
 	usb_host_controller_base_paddr = (unsigned long)usbBaseReg;
+
+	init_ok = true;
 }
 
 /* Main -----------------------------------------------------------------------------*/
 int run()
 {
+	if (!init_ok)
+	{
+		Debug_LOG_ERROR("Initialization failed!");
+		return OS_ERROR_INVALID_STATE;
+	}
+
 	if (!USPiInitialize())
 	{
 		Debug_LOG_ERROR("Cannot initialize USPi");

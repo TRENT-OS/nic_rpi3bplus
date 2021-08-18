@@ -88,6 +88,10 @@ import <if_OS_Timer.camkes>;
         dataport Buf usbBaseReg; \
         consumes DataAvailable usbBaseIrq; \
         \
+        /* optional connection to the LogServer */ \
+        maybe uses      if_OS_Logger            logServer_rpc; \
+        maybe dataport  Buf                     logServer_port; \
+        \
         /* provide NIC Driver interface ------------------------------- */ \
         IF_OS_NIC_PROVIDE(nic, _ringbuffer_size_) \
         \
@@ -188,3 +192,15 @@ import <if_OS_Timer.camkes>;
     _inst_.dma_pool                     = _dma_size_; \
     _inst_.nic_driver_init_done_value   = 0; \
     _inst_.nic_init_transfer_value      = 1;
+
+//------------------------------------------------------------------------------
+// Connect a LogServer to the NIC
+#define NIC_RPI3_INSTANCE_CONNECT_OPTIONAL_LOGGER(_nic_, _logserver_) \
+    \
+    connection seL4RPCCall conn_ ## _nic_ ## _ ## _logserver_ ## _rpc( \
+        from _nic_.logServer_rpc, \
+        to   _logserver_.logServer_rpc); \
+    \
+    connection seL4SharedData  conn_ ## _nic_ ## _ ## _logserver_ ## _port( \
+        from  _nic_.logServer_port, \
+        to    _logserver_.nwDriver_port);

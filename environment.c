@@ -120,25 +120,7 @@ int SetPowerStateOn (unsigned nDeviceId)
     return bcm2837_set_power_state_on(&mbox,nDeviceId) ? 1 : 0;
 }
 
-int GetMACAddress (unsigned char Buffer[MAC_ADDR_LEN])
+int GetMACAddress (unsigned char Buffer[MAC_ADDRESS_SIZE])
 {
-    PropertyTag_GetMACAddress_Request_t TagRequest;
-    PropertyTag_GetMACAddress_Response_t TagResponse;
-
-    int status = (&mbox)->message(&mbox,
-                                   TAG_GET_MAC_ADDRESS,
-                                   &TagRequest,
-                                   sizeof(TagRequest),
-                                   &TagResponse,
-                                   sizeof(TagResponse));
-
-    if(MAILBOX_OK != status){
-        Debug_LOG_ERROR("Failed to retrieve the MAC address!");
-        memset(Buffer,0,MAC_ADDR_LEN);
-        return 0;
-    }
-
-    memcpy(Buffer,TagResponse.mac_address,MAC_ADDR_LEN);
-
-    return 1;
+    return bcm2837_get_mac_address(&mbox,Buffer) ? 1 : 0;
 }

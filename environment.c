@@ -25,7 +25,8 @@ static const if_OS_Timer_t timer =
         timeServer_rpc,
         timeServer_notify);
 
-/* Environment functions -------------------------------------------------------------*/
+/* Environment functions -----------------------------------------------------*/
+
 void* dma_alloc (unsigned nSize, unsigned alignement)
 {
     // we are setting cached to false to allocate non-cached DMA memory for the
@@ -106,15 +107,6 @@ void ConnectInterrupt (unsigned nIRQ, TInterruptHandler* pHandler, void* pParam)
     Debug_LOG_WARNING("Not implemented!");
 }
 
-int mbox_init(ps_io_ops_t *io_ops){
-    int ret = mailbox_init(io_ops,&mbox);
-    if(ret < 0){
-        Debug_LOG_ERROR("Failed to initialize mailbox - error code: %d", ret);
-        return ret;
-    }
-    return 0;
-}
-
 int SetPowerStateOn (unsigned nDeviceId)
 {
     return bcm2837_set_power_state_on(&mbox,nDeviceId) ? 1 : 0;
@@ -123,4 +115,15 @@ int SetPowerStateOn (unsigned nDeviceId)
 int GetMACAddress (unsigned char Buffer[MAC_ADDRESS_SIZE])
 {
     return bcm2837_get_mac_address(&mbox,Buffer) ? 1 : 0;
+}
+
+/* Public functions ----------------------------------------------------------*/
+
+int mbox_init(ps_io_ops_t *io_ops){
+    int ret = mailbox_init(io_ops,&mbox);
+    if(ret < 0){
+        Debug_LOG_ERROR("Failed to initialize mailbox - error code: %d", ret);
+        return ret;
+    }
+    return 0;
 }

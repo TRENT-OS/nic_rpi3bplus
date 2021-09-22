@@ -18,6 +18,8 @@
 #include <camkes.h>
 #include <camkes/dma.h>
 
+#define MAC_ADDR_LEN 6
+
 static mailbox_t mbox;
 
 static const if_OS_Timer_t timer =

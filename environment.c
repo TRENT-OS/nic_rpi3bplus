@@ -109,12 +109,12 @@ void ConnectInterrupt (unsigned nIRQ, TInterruptHandler* pHandler, void* pParam)
 
 int SetPowerStateOn (unsigned nDeviceId)
 {
-    return bcm2837_set_power_state_on(&mbox,nDeviceId) ? 1 : 0;
+    return mailbox_set_power_state_on(&mbox,nDeviceId) ? 1 : 0;
 }
 
 int GetMACAddress (unsigned char Buffer[MAC_ADDRESS_SIZE])
 {
-    return bcm2837_get_mac_address(&mbox,Buffer) ? 1 : 0;
+    return mailbox_get_mac_address(&mbox,Buffer) ? 1 : 0;
 }
 
 /* Public functions ----------------------------------------------------------*/

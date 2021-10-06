@@ -23,7 +23,7 @@
 
 #include <sel4/sel4.h>
 
-#include <platsupport/plat/mailbox_util.h>
+#include <platsupport/mach/mailbox_util.h>
 
 // If we pass the define from a system configuration header. CAmkES generation
 // crashes when parsing this file. As a workaround we hardcode the value here

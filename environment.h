@@ -5,6 +5,6 @@
 
 #pragma once
 
-#include <platsupport/plat/mailbox_util.h>
+#include <platsupport/mach/mailbox_util.h>
 
 int mbox_init(ps_io_ops_t *io_ops);

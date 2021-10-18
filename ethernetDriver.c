@@ -51,8 +51,8 @@ static volatile bool init_ok = false;
 void
 post_init(void)
 {
-	ps_io_ops_t io_ops;
-	int ret = camkes_io_ops(&io_ops);
+    ps_io_ops_t io_ops;
+    int ret = camkes_io_ops(&io_ops);
     if (0 != ret)
     {
         Debug_LOG_ERROR("camkes_io_ops() failed - error code: %d", ret);
@@ -63,65 +63,65 @@ post_init(void)
     ret = mbox_init(&io_ops);
     if (0 != ret)
     {
-		Debug_LOG_ERROR("Mailbox initialization failed!");
+        Debug_LOG_ERROR("Mailbox initialization failed!");
         return;
     }
 
-	usb_host_controller_base_paddr = (unsigned long)usbBaseReg;
+    usb_host_controller_base_paddr = (unsigned long)usbBaseReg;
 
-	init_ok = true;
+    init_ok = true;
 }
 
 /* Main -----------------------------------------------------------------------------*/
 int run()
 {
-	if (!init_ok)
-	{
-		Debug_LOG_ERROR("Initialization failed!");
-		return OS_ERROR_INVALID_STATE;
-	}
+    if (!init_ok)
+    {
+        Debug_LOG_ERROR("Initialization failed!");
+        return OS_ERROR_INVALID_STATE;
+    }
 
-	if (!USPiInitialize())
-	{
-		Debug_LOG_ERROR("Cannot initialize USPi");
-	}
+    if (!USPiInitialize())
+    {
+        Debug_LOG_ERROR("Cannot initialize USPi");
+    }
 
-	Debug_LOG_INFO("[EthDrv '%s'] starting", get_instance_name());
+    Debug_LOG_INFO("[EthDrv '%s'] starting", get_instance_name());
 
-	if (!USPiEthernetAvailable ())
-	{
-		Debug_LOG_ERROR("Ethernet device not found");
-	}
+    if (!USPiEthernetAvailable ())
+    {
+        Debug_LOG_ERROR("Ethernet device not found");
+    }
 
-	unsigned nTimeout = 0;
-	while (!USPiEthernetIsLinkUp ())
-	{
-		MsDelay (100);
+    unsigned nTimeout = 0;
+    while (!USPiEthernetIsLinkUp ())
+    {
+        MsDelay (100);
 
-		if (++nTimeout < 40)
-		{
-			continue;
-		}
-		nTimeout = 0;
+        if (++nTimeout < 40)
+        {
+            continue;
+        }
+        nTimeout = 0;
 
-		Debug_LOG_WARNING("Link is down");
-	}
+        Debug_LOG_WARNING("Link is down");
+    }
 
-	Debug_LOG_DEBUG("Link is up");
+    Debug_LOG_DEBUG("Link is up");
 
-	if(!nic_driver_init_done_post())
-	{
-		Debug_LOG_DEBUG("Post failed.");
-	}
+    if (!nic_driver_init_done_post())
+    {
+        Debug_LOG_DEBUG("Post failed.");
+    }
 
-	uint8_t* Buffer = (uint8_t*)dma_alloc(DMA_PAGE_SIZE, DMA_ALIGNEMENT);
-	size_t receivedLength = 0;
+    uint8_t* Buffer = (uint8_t*)dma_alloc(DMA_PAGE_SIZE, DMA_ALIGNEMENT);
+    size_t receivedLength = 0;
 
-	unsigned int count = 0;
-	while(true)
-	{
-		if(USPiReceiveFrame(Buffer, &receivedLength))
-		{
+    unsigned int count = 0;
+    while (true)
+    {
+        if (USPiReceiveFrame(Buffer, &receivedLength))
+        {
             OS_NetworkStack_RxBuffer_t* buf_ptr = (OS_NetworkStack_RxBuffer_t*)nic_to_port;
 
             if (receivedLength > sizeof(buf_ptr->data) )
@@ -136,66 +136,68 @@ int run()
             }
 
             // if the slot to be used in the ringbuffer isn't empty we
-			// wait here in a loop
-			// TODO: Implement it in an event driven fashion
-			while(buf_ptr[count].len != 0) {
+            // wait here in a loop
+            // TODO: Implement it in an event driven fashion
+            while (buf_ptr[count].len != 0)
+            {
                 seL4_Yield();
             }
-			memcpy(buf_ptr[count].data, Buffer, receivedLength);
-			buf_ptr[count].len = receivedLength;
+            memcpy(buf_ptr[count].data, Buffer, receivedLength);
+            buf_ptr[count].len = receivedLength;
             count = (count + 1) % NIC_DRIVER_RINGBUFFER_NUMBER_ELEMENTS;
             nic_event_hasData_emit();
-		}
-	}
+        }
+    }
 
-	dma_free(Buffer, DMA_ALIGNEMENT);
+    dma_free(Buffer, DMA_ALIGNEMENT);
 
-	return 0;
+    return 0;
 }
 
 /* nic_rpc interface ----------------------------------------------------------------*/
 
 OS_Error_t
 nic_rpc_rx_data(
-	size_t* pLen,
-	size_t* framesRemaining)
+    size_t* pLen,
+    size_t* framesRemaining)
 {
     return OS_ERROR_NOT_IMPLEMENTED;
 }
 
 OS_Error_t nic_rpc_tx_data(
-	size_t* len)
+    size_t* len)
 {
-	if (!USPiSendFrame(nic_from_port, *len))
-	{
+    if (!USPiSendFrame(nic_from_port, *len))
+    {
         Debug_LOG_ERROR("USPiSendFrame failed");
-		return OS_ERROR_ABORTED;
-	}
+        return OS_ERROR_ABORTED;
+    }
 
-	return OS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 OS_Error_t nic_rpc_get_mac_address(void)
 {
-	if(!nic_driver_init_done_wait())
-	{
-		Debug_LOG_DEBUG("Wait failed.");
-	}
+    if (!nic_driver_init_done_wait())
+    {
+        Debug_LOG_DEBUG("Wait failed.");
+    }
 
-	USPiGetMACAddress((uint8_t*)nic_to_port);
+    USPiGetMACAddress((uint8_t*)nic_to_port);
 
-	return OS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 /* USB interrupt handler -----------------------------------------------------------------*/
-void usbBaseIrq_handle(void) {
+void usbBaseIrq_handle(void)
+{
 
-	DWHCIDeviceInterruptHandler(NULL);
+    DWHCIDeviceInterruptHandler(NULL);
 
-	int error = usbBaseIrq_acknowledge();
+    int error = usbBaseIrq_acknowledge();
 
-    if(error != 0)
-	{
-		Debug_LOG_ERROR("Failed to acknowledge the interrupt!");
-	}
+    if (error != 0)
+    {
+        Debug_LOG_ERROR("Failed to acknowledge the interrupt!");
+    }
 }

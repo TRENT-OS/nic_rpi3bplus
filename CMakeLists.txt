@@ -1,8 +1,9 @@
 #
 # NIC RPi3 driver
 #
-# Copyright (C) 2020-2021, HENSOLDT Cyber GmbH
-# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2020-2024, HENSOLDT Cyber GmbH
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 cmake_minimum_required(VERSION 3.17)

@@ -19,6 +19,7 @@
 import <std_connector.camkes>;
 #include <if_OS_Nic.camkes>
 import <if_OS_Timer.camkes>;
+import <if_OS_Logger.camkes>;
 
 
 //------------------------------------------------------------------------------
@@ -95,6 +96,10 @@ import <if_OS_Timer.camkes>;
         /* usage of Timer ---------------------------------- */ \
         uses if_OS_Timer timeServer_rpc; \
         consumes TimerReady timeServer_notify; \
+        \
+        /* optional connection to the LogServer */ \
+        maybe uses      if_OS_Logger            logServer_rpc; \
+        maybe dataport  Buf                     logServer_port; \
     }
 
 
@@ -189,3 +194,16 @@ import <if_OS_Timer.camkes>;
     _inst_.dma_pool                     = _dma_size_; \
     _inst_.nic_driver_init_done_value   = 0; \
     _inst_.nic_init_transfer_value      = 1;
+
+
+//------------------------------------------------------------------------------
+// Connect a LogServer to the NIC
+#define NIC_RPi_INSTANCE_CONNECT_OPTIONAL_LOGGER(_nic_, _logserver_) \
+    \
+    connection seL4RPCCall conn_ ## _nic_ ## _ ## _logserver_ ## _rpc( \
+        from _nic_.logServer_rpc, \
+        to   _logserver_.logServer_rpc); \
+    \
+    connection seL4SharedData  conn_ ## _nic_ ## _ ## _logserver_ ## _port( \
+        from  _nic_.logServer_port, \
+        to    _logserver_.nwDriver_port);

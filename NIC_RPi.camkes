@@ -7,7 +7,7 @@
  *
  * to be used as:
  *
- *   #include "NIC_RPI/NIC_RPi.camkes"
+ *   #include "NIC_RPi3Bplus/NIC_RPi.camkes"
  *   NIC_RPi_Mailbox_COMPONENT_DEFINE(NIC_RPi_Mailbox)
  *   NIC_RPi_USB_COMPONENT_DEFINE(NIC_RPi_USB)
  *   NIC_RPi_COMPONENT_DEFINE(NIC_RPI, 4096)
